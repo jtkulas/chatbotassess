@@ -1,0 +1,18 @@
+Idea:
+
+Train LLM with qualitative needs assessment data (e.g., interview transcripts, workshop summaries, questionnaire)
+
+chatbot for needs assessment
+
+Take company pulse along constructs such as engagement, satisfaction, commitment, org identification
+
+
+chatbot for assessment & contrast with traditional psychological assessment/inventory
+
+LLM tells chatbot what to ask and how to respond
+
+optimal point estimate with chatbot (e.g., how many questions necessary prior to minimizing error in construct estimate?) KULAS PREFERENCE
+
+Use metaphor of IRT - tailor questions toward trait level & stop asking when error minimized on trait estimate (train on different levels of trait)
+
+Method: contrast trait estimates with other measures of trait - correlate all with criterion
