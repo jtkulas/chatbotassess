@@ -90,52 +90,21 @@
 
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
 
 
-% definitions for citeproc citations
-\NewDocumentCommand\citeproctext{}{}
-\NewDocumentCommand\citeproc{mm}{%
-  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
-\makeatletter
- % allow citations to break across lines
- \let\@cite@ofmt\@firstofone
- % avoid brackets around text for \cite:
- \def\@biblabel#1{}
- \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
-\makeatother
-\newlength{\cslhangindent}
-\setlength{\cslhangindent}{1.5em}
-\newlength{\csllabelwidth}
-\setlength{\csllabelwidth}{3em}
-\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
- {\begin{list}{}{%
-  \setlength{\itemindent}{0pt}
-  \setlength{\leftmargin}{0pt}
-  \setlength{\parsep}{0pt}
-  % turn on hanging indent if param 1 is 1
-  \ifodd #1
-   \setlength{\leftmargin}{\cslhangindent}
-   \setlength{\itemindent}{-1\cslhangindent}
-  \fi
-  % set entry spacing
-  \setlength{\itemsep}{#2\baselineskip}}}
- {\end{list}}
-\usepackage{calc}
-\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
-\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 
 
@@ -327,401 +296,76 @@ St., Albany, NY, USA, Email: \href{mailto:sm@example.org}{sm@example.org}}
 \setlength\LTleft{0pt}
 
 
-This is my introductory paragraph. The title will be placed above it
-automatically. \emph{Do not start with an introductory heading} (e.g.,
-``Introduction''). The title acts as your Level 1 heading for the
-introduction.
-
-Details about writing headings with markdown in APA style are
-\href{https://wjschne.github.io/apaquarto/writing.html\#headings-in-apa-style}{here}.
-
-\subsection{Displaying Figures}\label{displaying-figures}
-
-A reference label for a figure must have the prefix \texttt{fig-}, and
-in a code chunk, the caption must be set with \texttt{fig-cap}. Captions
-are in
-\href{https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case}{title
-case}.
-
-\begin{figure}[!htbp]
-
-{\caption{{The Figure Caption}{\label{fig-myplot}}}}
-
-\includegraphics{example_files/figure-pdf/fig-myplot-1.pdf}
-
-{\noindent \emph{Note.} This is the note below the figure.}
-
-\end{figure}
-
-To refer to any figure or table, use the \texttt{@} symbol followed by
-the reference label (e.g., Figure~\ref{fig-myplot}).
-
-\subsection{Imported Graphics}\label{imported-graphics}
-
-One way to import an existing graphic as a figure is to use
-\texttt{knitr::include\_graphics} in a code chunk. For example,
-Figure~\ref{fig-import1} is an imported image. Note that in
-apaquarto-pdf documents, we can specify that that a figure or table
-should span both columns when in journal mode by setting the
-\texttt{apa-twocolumn} chunk option to \texttt{true}. For other formats,
-this distinction does not matter.
-
-\begin{figure}[!htbp]
-
-{\caption{{An Imported Graphic}{\label{fig-import1}}}}
-
-\includegraphics[width=0.48\textwidth,height=\textheight]{sampleimage.png}
-
-{\noindent \emph{Note.} A note below the figure}
-
-\end{figure}
-
-Figure graphics can be imported directly with Markdown, as with
-Figure~\ref{fig-import2}.
-
-\begin{figure}[!htbp]
-
-{\caption{{Another Way to Import Graphics}{\label{fig-import2}}}}
-
-\includegraphics[width=0.49\textwidth,height=\textheight]{sampleimage.png}
-
-{\noindent \emph{Note.} A note below the figure}
-
-\end{figure}
-
-Which style of creating figures you choose depends on preference and
-need.
-
-\subsection{Displaying Tables}\label{displaying-tables}
-
-We can make a table the same way as a figure. Generating a table that
-conforms to APA format in all document formats can be tricky. When the
-table is simple, the \texttt{kable} function from knitr works well. Feel
-free to experiment with different methods, but I have found that David
-Gohel's \href{https://davidgohel.github.io/flextable/}{flextable} to be
-the best option when I need something more complex.
-
-\begin{ThreePartTable}
-
-\begin{longtable}[]{@{}rl@{}}
-
-\caption{\label{tbl-mytable}The Table Caption}
-
-\tabularnewline
-
-\toprule\noalign{}
-Numbers & Letters \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-1 & A \\
-2 & B \\
-3 & C \\
-4 & D \\
-
-\end{longtable}
-
-{\noindent \emph{Note.} The note below the table.}
-
-\end{ThreePartTable}
-
-To refer to this table in text, use the \texttt{@} symbol followed by
-the reference label like so: As seen in Table~\ref{tbl-mytable}, the
-first few numbers and letters of the alphabet are displayed.
-
-In Table~\ref{tbl-mymarkdowntable}, there is an example of a plain
-markdown table in a fenced div.
-
-\begin{ThreePartTable}
-
-\begin{longtable}[]{@{}llrc@{}}
-\caption{Table Caption of a Markdown
-Table}\label{tbl-mymarkdowntable}\tabularnewline
-\toprule\noalign{}
-Default & Left & Right & Center \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-Default & Left & Right & Center \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-12 & 12 & 12 & 12 \\
-123 & 123 & 123 & 123 \\
-1 & 1 & 1 & 1 \\
-\end{longtable}
-
-{\noindent \emph{Note.} This is a note below the markdown table.}
-
-\end{ThreePartTable}
-
-Table~\ref{tbl-mymarkdowntable2} is an example of a plain markdown table
-without a fenced div. Note the that the caption begins with a colon.
-
-\begin{ThreePartTable}
-
-\begin{longtable}[]{@{}cc@{}}
-\caption{My Caption.}\label{tbl-mymarkdowntable2}\tabularnewline
-\toprule\noalign{}
-Letters & Numbers \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-Letters & Numbers \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-A & 1 \\
-B & 2 \\
-C & 3 \\
-\end{longtable}
-
-{\noindent \emph{Note.} My note}
-
-\end{ThreePartTable}
-
-What if you want the tables and figures to be at the end of the
-document? In the .pdf format, you can set the \texttt{floatsintext}
-option to false. For .html and .docx documents, there is not yet an
-automatic way to put tables and figures at the end. You can, of course,
-just put them all at the end, in order. The reference labels will work
-no matter where they are in the text.
-
-\subsection{Tables and Figures Spanning Two Columns in Journal
-Mode}\label{tables-and-figures-spanning-two-columns-in-journal-mode}
-
-When creating tables and figures in journal mode, care must be taken not
-to make figures and tables wider than the columns, otherwise \LaTeX
-sometimes makes them disappear.
-
-As demonstrated in Figure~\ref{fig-twocolumn}, you can make figures
-tables span the two columns by setting the \texttt{apa-twocolumn} chunk
-option to \texttt{true}.
-
-\begin{figure*}[!htbp]
-
-{\caption{{A Figure Spanning Two Columns When in Journal
-Mode}{\label{fig-twocolumn}}}}
-
-\begin{center}
-\includegraphics{example_files/figure-pdf/fig-twocolumn-1.pdf}
-\end{center}
-
-{\noindent \emph{Note.} Figures in two-column mode are only different
-for jou mode in .pdf documents}
-
-\end{figure*}
-
-\subsection{Math and Equations}\label{math-and-equations}
-
-Inline math uses \LaTeX syntax with single dollar signs. For example,
-the reliability coefficient of my measure is \(r_{XX}=.95\).
-
-If you want to display and refer to a specific formula, enclose the
-formula in two dollar signs. After the second pair of dollar signs,
-place the label in curly braces. The label should have an \texttt{\#eq-}
-prefix. To refer to the formula, use the same label but with the
-\texttt{@} symbol. For example, Equation~\ref{eq-euler} is Euler's
-Identity, which is much admired for its elegance.
-
-\subsection{Citations}\label{citations}
-
-See
-\href{https://quarto.org/docs/authoring/footnotes-and-citations.html}{here}
-for instructions on setting up citations and references.
-
-A parenthetical citation requires square brackets
-(\citeproc{ref-CameronTrivedi2013}{Cameron \& Trivedi, 2013}). This
-reference was in my bibliography file. An in-text citation is done like
-so:
-
-Cameron and Trivedi (\citeproc{ref-CameronTrivedi2013}{2013}) make some
-important points \ldots{}
-
-See
-\href{https://wjschne.github.io/apaquarto/writing.html\#references}{here}
-for explanations, examples, and citation features exclusive to
-apaquarto. For example, apaquarto can automatically handle possessive
-citations:
-
-Schneider and McGrew's (\citeproc{ref-schneider2012cattell}{2012})
-position was \ldots{}
-
-\subsection{Masking Author Identity for Peer
-Review}\label{masking-author-identity-for-peer-review}
-
-Setting \texttt{mask} to \texttt{true} will remove author names,
-affiliations, and correspondence from the title page. Any references
-listed in the \texttt{masked-citations} field will be masked as well.
-See
-\href{https://wjschne.github.io/apaquarto/writing.html\#masked-citations-for-anonymous-peer-review}{here}
-for more information.
-
-\begin{equation}\phantomsection\label{eq-euler}{
-e^{i\pi}+1=0
-}\end{equation}
-
-\subsection{Block Quotes}\label{block-quotes}
-
-Sometimes you want to give a longer quote that needs to go in its own
-paragraph. Block quotes are on their own line starting with the
-\textgreater{} character. For example, Austen's
-(\citeproc{ref-austenMansfieldPark1990}{1814/1990}) \emph{Mansfield
-Park} has some memorable insights about the mind:
-
-\begin{quote}
-If any one faculty of our nature may be called more wonderful than the
-rest, I do think it is memory. There seems something more speakingly
-incomprehensible in the powers, the failures, the inequalities of
-memory, than in any other of our intelligences. The memory is sometimes
-so retentive, so serviceable, so obedient; at others, so bewildered and
-so weak; and at others again, so tyrannic, so beyond control! We are, to
-be sure, a miracle every way; but our powers of recollecting and of
-forgetting do seem peculiarly past finding out. (p.~163)
-\end{quote}
-
-If your quote has multiple paragraphs, like this passage from Brown
-(\citeproc{ref-brownHowKilledPluto2012}{2012}), separate them with a
-lone \texttt{\textgreater{}} character between the lines:
-
-\begin{quote}
-In the entire field of astronomy, there is no word other than
-\emph{planet} that has a precise, lawyerly definition, in which certain
-criteria are specifically enumerated. Why does \emph{planet} have such a
-definition but \emph{star}, \emph{galaxy}, and \emph{giant molecular
-cloud} do not? Because in astronomy, as in most sciences, scientists
-work by concepts rather than by definitions. The concept of a star is
-clear; a star is a collection of gas with fusion reactions in the
-interior giving off energy. A galaxy is a large, bound collection of
-stars. A giant molecular cloud is a giant cloud of molecules. The
-concept of a planet---in the eight-planet solar system---is equally
-simple to state. A planet is a one of a small number of bodies that
-dominate a planetary system. That is a concept, not a definition. How
-would you write that down in a precise definition?
-
-I wouldn't. Once you write down a definition with lawyerly precision,
-you get the lawyers involved in deciding whether or not your objects are
-planets. Astronomers work in concepts. We rarely call in the attorneys
-for adjudication. (p.~242)
-\end{quote}
-
-\subsection{Hypotheses, Aims, and
-Objectives}\label{hypotheses-aims-and-objectives}
-
-The last paragraph of the introduction usually states the specific
-hypotheses of the study, often in a way that links them to the research
-design.
-
-\section{Method}\label{method}
-
-chatbot for assessment \& contrast with traditional psychological
-assessment/inventory
-
-LLM tells chatbot what to ask and how to respond
-
-optimal point estimate with chatbot (e.g., how many questions necessary
-prior to minimizing error in construct estimate?) KULAS PREFERENCE
-
-Use metaphor of IRT - tailor questions toward trait level \& stop asking
-when error minimized on trait estimate (train on different levels of
-trait)
-
-Method: contrast trait estimates with other measures of trait -
-correlate all with criterion
-
-\subsection{Participants}\label{participants}
-
-Who are they? How were they recruited? Report criteria for participant
-inclusion and exclusion. Perhaps some basic demographic stats are in
-order. A table is a great way to avoid repetition in statistical
-reporting.
-
-\subsection{Measures}\label{measures}
-
-GPT--4 is best suited for a conversational chat--bot because DeepSeek
-03mini are better for solving logic problems or fix code. For generating
-\emph{text}, GPT--4 is bettwer (Diego personal communication, 4/16/25)
-
-\subsection{Procedure}\label{procedure}
-
-What did participants do? How are the data going to be analyzed?
-
-\section{Results}\label{results}
-
-\subsection{Descriptive Statistics}\label{descriptive-statistics}
-
-Describe the basic characteristics of the primary variables. My ideal is
-to describe the variables well enough that someone conducting a
-meta-analysis can include the study without needing to ask for
-additional information.
-
-\section{Discussion}\label{discussion}
-
-Describe results in non-statistical terms.
-
-\subsection{Limitations and Future
-Directions}\label{limitations-and-future-directions}
-
-Every study has limitations. Based on this study, some additional steps
-might include\ldots{}
-
-\subsection{Conclusion}\label{conclusion}
-
-Describe the main point of the paper.
-
-\section{References}\label{references}
-
-\phantomsection\label{refs}
-\begin{CSLReferences}{1}{0}
-\bibitem[\citeproctext]{ref-austenMansfieldPark1990}
-Austen, J. (1990). \emph{Mansfield {P}ark}. Oxford University Press.
-(Original work published 1814)
-
-\bibitem[\citeproctext]{ref-brownHowKilledPluto2012}
-Brown, M. (2012). \emph{How {I} killed {Pluto} and why it had it
-coming}. Spiegel \& Grau.
-
-\bibitem[\citeproctext]{ref-CameronTrivedi2013}
-Cameron, A. C., \& Trivedi, P. K. (2013). \emph{Regression analysis of
-count data} (2nd ed.). Cambridge University Press.
-\url{https://doi.org/10.1017/CBO9781139013567}
-
-\bibitem[\citeproctext]{ref-schneider2012cattell}
-Schneider, W. J., \& McGrew, K. S. (2012). The {Cattell-Horn-Carroll}
-model of intelligence. In D. P. Flanagan \& P. L. Harrison (Eds.),
-\emph{Contemporary intellectual assessment: {Theories}, tests, and
-issues} (3rd ed., pp. 99--144). Guilford Press.
-\url{https://psycnet.apa.org/record/2012-09043-004}
-
-\end{CSLReferences}
-
-\appendix
-
-\section{The Title for Appendix}\label{the-title-for-appendix}
-
-If there are multiple appendices, label them with level 1 headings as
-Appendix A, Appendix B, and so forth.
-
-Tables and figures in the first appendix automatically get the prefix
-``A'', and the numbering starts again at 1. See
-Figure~\ref{fig-appendfig}.
-
-If there were a second appendix, tables and figures would get the prefix
-``B'', and the numbering starts again at 1. Make as many appendices as
-needed.
-
-\begin{figure}
-
-{\caption{{Appendix Figure}{\label{fig-appendfig}}}}
-
-\includegraphics{sampleimage.png}
-
-{\noindent \emph{Note.} A note below the figure}
-
-\end{figure}
+\subsection{Borsboom philosophy (Grok
+5/14/25)}\label{borsboom-philosophy-grok-51425}
+
+Network psychometrics, as shaped by Denny Borsboom, is grounded in a
+philosophical shift from traditional psychometric models, emphasizing a
+network perspective on psychological phenomena. This approach draws from
+causal realism, complex systems theory, and a rejection of latent
+variable models as the sole explanatory framework. Below are the key
+philosophical underpinnings:
+
+\begin{itemize}
+\item
+  \textbf{Causal Realism}: Borsboom advocates for understanding
+  psychological constructs (e.g., depression, intelligence) as networks
+  of interacting components (e.g., symptoms, behaviors) rather than as
+  reflections of a single latent variable. Symptoms like sadness or
+  fatigue in depression are not mere indicators of an underlying cause
+  but are causally connected, influencing each other directly (e.g.,
+  sadness → sleep problems → fatigue). This aligns with a realist
+  ontology where the network itself is the phenomenon, not a proxy for
+  something unobservable.
+\item
+  \textbf{Rejection of Latent Variable Dogma}: Traditional psychometrics
+  often assumes latent variables (e.g., a ``depression'' factor) cause
+  observed behaviors. Borsboom challenges this, arguing that latent
+  variables are often statistical conveniences, not necessarily real
+  entities. Network psychometrics treats psychological constructs as
+  emergent properties of dynamic, reciprocal interactions among
+  observable variables, sidestepping the need for latent causes unless
+  empirically justified.
+\item
+  \textbf{Complex Systems Perspective}: Inspired by systems theory,
+  Borsboom views psychological phenomena as complex, self-organizing
+  systems. Networks exhibit properties like feedback loops, tipping
+  points, and hysteresis (e.g., a person may remain depressed even after
+  an initial trigger subsides due to self-reinforcing symptom networks).
+  This perspective emphasizes dynamics over static measurement, aligning
+  with a process-based ontology.
+\item
+  \textbf{Mutualism and Emergent Phenomena}: Borrowing from biological
+  and ecological models, Borsboom's mutualism suggests that
+  psychological traits emerge from mutual interactions among lower-level
+  components (e.g., cognitive abilities reinforcing each other). This
+  contrasts with the idea of a single, top-down cause, emphasizing a
+  bottom-up, interactive process where the whole (the construct) arises
+  from the parts (the network).
+\item
+  \textbf{Pragmatic Epistemology}: Network psychometrics prioritizes
+  empirical utility and predictive power over rigid adherence to
+  traditional models. Borsboom emphasizes that models should be judged
+  by their ability to explain and predict real-world data, encouraging
+  iterative refinement of network models based on empirical findings
+  rather than dogmatic assumptions about latent structures.
+\item
+  \textbf{Interdisciplinary Influence}: The approach integrates insights
+  from graph theory, statistical mechanics, and philosophy of science
+  (e.g., rejecting reification of statistical constructs). It reflects a
+  broader anti-reductionist stance, acknowledging that psychological
+  phenomena are multiply determined and context-dependent, resisting
+  oversimplified causal stories.
+\end{itemize}
+
+In summary, Borsboom's network psychometrics is philosophically rooted
+in a causal, dynamic, and emergent view of psychological phenomena,
+prioritizing observable interactions over latent abstractions. It
+embraces complexity, rejects reification of statistical constructs, and
+aligns with a realist yet pragmatic approach to understanding the mind.
+For a deeper dive, Borsboom's seminal works, like A Network Theory of
+Mental Disorders (2017), articulate these ideas with empirical
+applications.
 
 
 
